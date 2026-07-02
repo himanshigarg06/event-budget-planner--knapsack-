@@ -1,6 +1,6 @@
 #include <iostream>
 #include <vector>
-
+#include "comparison.h"
 #include "vendor.h"
 #include "menu.h"
 #include "greedy.h"
@@ -73,16 +73,25 @@ int main()
 
             case 5:
 
-                cout << "\nThank you for using Event Budget Planner.\n";
+    if (budget == 0)
+    {
+        cout << "\nPlease enter the budget first.\n";
+    }
+    else
+    {
+        compareAlgorithms(vendors, budget);
+    }
 
-                break;
+    break;
 
-            default:
+case 6:
 
-                cout << "\nInvalid choice. Please try again.\n";
+    cout << "\nThank you for using Event Budget Planner.\n";
+
+    break;
         }
 
-    } while (choice != 5);
+    } while (choice != 6);
 
     return 0;
 }

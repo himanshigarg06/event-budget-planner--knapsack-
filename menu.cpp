@@ -16,7 +16,8 @@ void displayMenu()
     cout << "2. Enter Event Budget\n";
     cout << "3. Run Greedy Planner\n";
     cout << "4. Run Dynamic Programming\n";
-    cout << "5. Exit\n";
+    cout << "5. Compare Algorithms\n";
+    cout << "6. Exit\n";
 
     cout << "\nEnter your choice: ";
 }
