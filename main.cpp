@@ -12,7 +12,13 @@ int main()
 {
     vector<Vendor> vendors;
 
-    loadSampleVendors(vendors);
+    if (!loadVendorsFromFile(vendors, "vendors.txt"))
+{
+    cout << "Vendor file not found.\n";
+    cout << "Loading default vendors...\n\n";
+
+    loadDefaultVendors(vendors);
+}
 
     int choice;
     int budget = 0;

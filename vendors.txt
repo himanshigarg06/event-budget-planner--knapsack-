@@ -1,0 +1,15 @@
+Premium Catering,34000,95
+Photography,18000,55
+Decoration,16000,54
+DJ,15000,52
+Lighting,10000,36
+Security,9000,33
+Stage Setup,14000,46
+LED Screen,17000,50
+Live Band,23000,70
+Flowers,7000,24
+Invitation Printing,5000,18
+Welcome Gifts,6000,20
+Videography,19000,58
+Sound System,12000,39
+Games Zone,11000,37
