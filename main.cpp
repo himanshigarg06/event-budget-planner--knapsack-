@@ -8,6 +8,7 @@
 #include "knapsack.h"
 #include "report.h"
 #include "session.h"
+#include "vendor_manager.h"
 
 using namespace std;
 
@@ -94,6 +95,11 @@ int main()
 
     break;
 case 6:
+
+    manageVendors(vendors);
+
+    break;
+case 7:
 {
     int option;
 
@@ -147,14 +153,14 @@ case 6:
 
     break;
 }
-case 7:
+case 8:
 
     cout << "\nThank you for using Event Budget Planner.\n";
 
     break;
         }
 
-    } while (choice != 7);
+    } while (choice != 8);
 
     return 0;
 }
