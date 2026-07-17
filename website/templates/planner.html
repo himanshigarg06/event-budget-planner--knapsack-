@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<section>
+
+<div class="container">
+
+<div class="section-header">
+
+<h2>Event Planner</h2>
+
+<p>
+Enter your event details and let BudgetWise optimize your budget.
+</p>
+
+</div>
+
+<form action="/optimize" method="POST" class="card" style="padding:40px;">
+
+<label>Event Name</label><br><br>
+
+<input
+type="text"
+name="event_name"
+required>
+
+<br><br>
+
+<label>Event Type</label><br><br>
+
+<select name="event_type">
+
+<option>Wedding</option>
+
+<option>Birthday</option>
+
+<option>Conference</option>
+
+<option>College Fest</option>
+
+<option>Other</option>
+
+</select>
+
+<br><br>
+
+<label>Total Budget (₹)</label><br><br>
+
+<input
+type="number"
+name="budget"
+required>
+
+<br><br>
+
+<label>Guests</label><br><br>
+
+<input
+type="number"
+name="guests"
+required>
+
+<br><br>
+
+<button class="btn btn-primary">
+
+Optimize Budget
+
+</button>
+
+</form>
+
+</div>
+
+</section>
+
+{% endblock %}

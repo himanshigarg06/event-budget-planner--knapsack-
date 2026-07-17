@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<section>
+
+<div class="container">
+
+<div class="section-header">
+
+<h2>Optimization Result</h2>
+
+<p>{{ event_name }}</p>
+
+</div>
+
+<div class="card" style="padding:40px;">
+
+<pre>
+
+{{ output }}
+
+</pre>
+
+</div>
+
+</div>
+
+</section>
+
+{% endblock %}
