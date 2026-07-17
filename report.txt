@@ -1,0 +1,26 @@
+=============================================
+         EVENT BUDGET PLANNER REPORT
+=============================================
+
+Algorithm : Dynamic Programming
+Budget    : Rs. 34500
+Generated : Fri Jul 17 20:11:32 2026
+
+Selected Vendors
+---------------------------------------------
+1. DJ
+   Cost  : Rs. 15000
+   Value : 52
+
+2. Lighting
+   Cost  : Rs. 10000
+   Value : 36
+
+3. Security
+   Cost  : Rs. 9000
+   Value : 33
+
+---------------------------------------------
+Total Cost      : Rs. 34000
+Remaining Budget: Rs. 500
+Total Value     : 121

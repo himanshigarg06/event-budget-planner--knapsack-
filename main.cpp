@@ -1,10 +1,13 @@
 #include <iostream>
 #include <vector>
+
 #include "comparison.h"
 #include "vendor.h"
 #include "menu.h"
 #include "greedy.h"
 #include "knapsack.h"
+#include "report.h"
+#include "session.h"
 
 using namespace std;
 
@@ -19,9 +22,9 @@ int main()
 
     loadDefaultVendors(vendors);
 }
-
+    PlannerSession session;
     int choice;
-    int budget = 0;
+    //int budget = 0;
 
     do
     {
@@ -38,66 +41,120 @@ int main()
 
             case 2:
 
-                budget = getBudget();
+                session.budget = getBudget();
 
                 cout << "\nBudget saved successfully!\n";
-                cout << "Current Budget : Rs. " << budget << endl;
+                cout << "Current Budget : Rs. " << session.budget << endl;
 
                 break;
 
             case 3:
 
-                if (budget == 0)
+                if (session.budget == 0)
                 {
                     cout << "\nPlease enter the budget first.\n";
                 }
                 else
                 {
-                    GreedyResult greedyResult =
-                        runGreedy(vendors, budget);
+                    session.greedyResult =
+                        runGreedy(vendors, session.budget);
+                    session.hasGreedyResult = true;
 
-                    displayGreedyResult(greedyResult, budget);
+                    displayGreedyResult(session.greedyResult, session.budget);
                 }
 
                 break;
 
             case 4:
 
-                if (budget == 0)
+                if (session.budget == 0)
                 {
                     cout << "\nPlease enter the budget first.\n";
                 }
                 else
                 {
-                    KnapsackResult dpResult =
-                        runKnapsack(vendors, budget);
-
-                    displayKnapsackResult(dpResult, budget);
+                    session.dpResult =
+                        runKnapsack(vendors, session.budget);
+                    session.hasDPResult = true;
+                    displayKnapsackResult(session.dpResult, session.budget);
                 }
 
                 break;
 
             case 5:
 
-    if (budget == 0)
+    if (session.budget == 0)
     {
         cout << "\nPlease enter the budget first.\n";
     }
     else
     {
-        compareAlgorithms(vendors, budget);
+        compareAlgorithms(vendors, session.budget);
     }
 
     break;
-
 case 6:
+{
+    int option;
+
+    cout << "\nGenerate Report\n";
+    cout << "1. Greedy Report\n";
+    cout << "2. Dynamic Programming Report\n";
+    cout << "Choice : ";
+
+    cin >> option;
+
+    bool success = false;
+
+    if (option == 1)
+    {
+        if (!session.hasGreedyResult)
+        {
+            cout << "\nRun Greedy Algorithm first.\n";
+        }
+        else
+        {
+            success = generateGreedyReport(
+                session.greedyResult,
+                session.budget
+            );
+        }
+    }
+    else if (option == 2)
+    {
+        if (!session.hasDPResult)
+        {
+            cout << "\nRun Dynamic Programming first.\n";
+        }
+        else
+        {
+            success = generateDPReport(
+                session.dpResult,
+                session.budget
+            );
+        }
+    }
+    else
+    {
+        cout << "\nInvalid choice.\n";
+    }
+
+    if (success)
+    {
+        cout << "\nReport generated successfully.\n";
+        cout << "Saved as report.txt\n";
+    }
+
+    break;
+}
+case 7:
 
     cout << "\nThank you for using Event Budget Planner.\n";
 
     break;
         }
 
-    } while (choice != 6);
+    } while (choice != 7);
 
     return 0;
 }
