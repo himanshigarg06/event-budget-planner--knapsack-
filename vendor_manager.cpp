@@ -14,8 +14,8 @@ void manageVendors(vector<Vendor>& vendors)
         cout << "1. Add Vendor\n";
         cout << "2. Update Vendor\n";
         cout << "3. Delete Vendor\n";
-        cout << "4. View Vendors\n";
-        cout << "5. Save Vendors\n";
+        cout << "4. Search Vendors\n";
+        cout << "5. View Vendors\n";
         cout << "6. Back\n";
 
         cout << "\nEnter choice : ";
@@ -88,7 +88,7 @@ void manageVendors(vector<Vendor>& vendors)
                     cout << "\nVendor with this name already exists.\n";
                     break;
                 }
-                vendors.push_back(v);
+                saveVendorsToFile(vendors,"vendors.txt");
                 cout << "\nVendor Added Successfully.\n";
                 break;
             }
@@ -146,6 +146,7 @@ void manageVendors(vector<Vendor>& vendors)
                     }
 
                 cout << "\nVendor Updated Successfully.\n";
+                saveVendorsToFile(vendors,"vendors.txt");
                 break;
                 }
             }
@@ -161,7 +162,7 @@ void manageVendors(vector<Vendor>& vendors)
                 if(index>=1 && index<=vendors.size())
                 {
                     vendors.erase(vendors.begin()+index-1);
-
+                    saveVendorsToFile(vendors,"vendors.txt");
                     cout << "\nVendor Deleted.\n";
                 }
                 else
@@ -172,19 +173,42 @@ void manageVendors(vector<Vendor>& vendors)
                 break;
             }
             case 4:
+            {
+                string keyword;
 
-                displayVendors(vendors);
+                cin.ignore();
+
+                cout << "\nEnter Vendor Name : ";
+
+                getline(cin, keyword);
+
+                bool found = false;
+
+                for(const auto &v : vendors)
+                {
+                    if(v.name.find(keyword)!=string::npos)
+                    {
+                        cout<<"\n"<<v.name<<endl;
+                        cout<<"Cost : "<<v.cost<<endl;
+                        cout<<"Value : "<<v.value<<endl;
+
+                        found=true;
+                    }
+                }
+
+                if(!found)
+                    cout<<"\nVendor Not Found.\n";
 
                 break;
-
+            }
             case 5:
-
-                if(saveVendorsToFile(vendors,"vendors.txt"))
-                    cout << "\nChanges Saved.\n";
-                else
-                    cout << "\nSave Failed.\n";
-
-                break;
+                displayVendors(vendors);
+                //if(saveVendorsToFile(vendors,"vendors.txt"))
+                 //   cout << "\nChanges Saved.\n";
+                //else
+                //    cout << "\nSave Failed.\n";
+//
+                //break;
 
             case 6:
 

@@ -53,19 +53,73 @@ void compareAlgorithms(
 
     cout << "\n-----------------------------------------------\n";
 
-    if (dpResult.totalValue > greedyResult.totalValue)
-    {
-        cout << "Winner : Dynamic Programming\n";
-        cout << "Additional Value Gained : "
-             << dpResult.totalValue - greedyResult.totalValue
-             << endl;
-    }
-    else if (dpResult.totalValue < greedyResult.totalValue)
-    {
-        cout << "Winner : Greedy\n";
-    }
-    else
-    {
-        cout << "Both algorithms produced the same result.\n";
-    }
+if (dpResult.totalValue > greedyResult.totalValue)
+{
+    cout << "Winner : Dynamic Programming\n";
+    cout << "Additional Value Gained : "
+         << dpResult.totalValue - greedyResult.totalValue
+         << endl;
+
+    cout << "\nRecommendation\n";
+    cout << "--------------\n";
+    cout << "Dynamic Programming is recommended because\n";
+    cout << "it produces the highest total event value\n";
+    cout << "while staying within the given budget.\n";
+}
+else if (greedyResult.totalValue > dpResult.totalValue)
+{
+    cout << "Winner : Greedy Algorithm\n";
+    cout << "Additional Value Gained : "
+         << greedyResult.totalValue - dpResult.totalValue
+         << endl;
+
+    cout << "\nRecommendation\n";
+    cout << "--------------\n";
+    cout << "Greedy is recommended for faster execution\n";
+    cout << "when a near-optimal solution is acceptable.\n";
+}
+else
+{
+    cout << "Result : Tie\n";
+
+    cout << "\nRecommendation\n";
+    cout << "--------------\n";
+    cout << "Both algorithms produced the same value.\n";
+    cout << "Greedy is preferred because it executes\n";
+    cout << "faster for this dataset.\n";
+}
+
+cout << "\nBudget Utilization\n";
+cout << "------------------\n";
+
+cout << fixed << setprecision(2);
+
+cout << "Greedy : "
+     << (greedyResult.totalCost * 100.0 / budget)
+     << "%\n";
+
+cout << "Dynamic Programming : "
+     << (dpResult.totalCost * 100.0 / budget)
+     << "%\n";
+
+cout << "\nEfficiency Summary\n";
+cout << "------------------\n";
+
+cout << "Greedy Vendors Selected : "
+     << greedyResult.selectedVendors.size()
+     << endl;
+
+cout << "DP Vendors Selected : "
+     << dpResult.selectedVendors.size()
+     << endl;
+
+cout << "Unused Budget (Greedy) : Rs. "
+     << budget - greedyResult.totalCost
+     << endl;
+
+cout << "Unused Budget (DP) : Rs. "
+     << budget - dpResult.totalCost
+     << endl;
+
+cout << "\n================================================\n";
 }

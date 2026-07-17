@@ -20,3 +20,9 @@ Makefile
 
 # Logs
 *.log
+
+# Generated reports
+report.txt
+
+# Compiled executable (your current output)
+eventplanner

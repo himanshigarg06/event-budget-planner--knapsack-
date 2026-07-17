@@ -3,24 +3,28 @@
 =============================================
 
 Algorithm : Dynamic Programming
-Budget    : Rs. 34500
-Generated : Fri Jul 17 20:11:32 2026
+Budget    : Rs. 34567
+Generated : Fri Jul 17 21:06:12 2026
 
 Selected Vendors
 ---------------------------------------------
-1. DJ
-   Cost  : Rs. 15000
-   Value : 52
-
-2. Lighting
+1. Lighting
    Cost  : Rs. 10000
    Value : 36
 
-3. Security
+2. Security
    Cost  : Rs. 9000
    Value : 33
 
+3. Flowers
+   Cost  : Rs. 7000
+   Value : 24
+
+4. Chocolate Fountain
+   Cost  : Rs. 8000
+   Value : 30
+
 ---------------------------------------------
 Total Cost      : Rs. 34000
-Remaining Budget: Rs. 500
-Total Value     : 121
+Remaining Budget: Rs. 567
+Total Value     : 123

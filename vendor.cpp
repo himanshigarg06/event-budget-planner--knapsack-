@@ -40,10 +40,25 @@ bool loadVendorsFromFile(
         getline(ss, cost, ',');
         getline(ss, value, ',');
 
-        vendor.cost = stoi(cost);
-        vendor.value = stoi(value);
+        try
+        {
+            vendor.cost = stoi(cost);
+            vendor.value = stoi(value);
 
-        vendors.push_back(vendor);
+            if (vendor.cost <= 0 || vendor.value <= 0)
+            {
+                cout << "Skipping invalid vendor: "
+                    << vendor.name << endl;
+                continue;
+            }
+
+            vendors.push_back(vendor);
+        }
+        catch (...)
+        {
+            cout << "Skipping corrupted record: "
+                << vendor.name << endl;
+        }
     }
 
     file.close();

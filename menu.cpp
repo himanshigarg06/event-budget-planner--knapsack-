@@ -19,7 +19,8 @@ void displayMenu()
     cout << "5. Compare Algorithms\n";
     cout << "6. Manage Vendors\n";
     cout << "7. Generate Report\n";
-    cout << "8. Exit\n";
+    cout << "8. Statistics\n";
+    cout << "9. Exit\n";
 
     cout << "\nEnter your choice: ";
 }

@@ -60,7 +60,18 @@ bool generateGreedyReport(
 
     file << "Total Value     : "
          << result.totalValue << endl;
+    file << "\nOptimization Summary\n";
+    file << "---------------------------------------------\n";
 
+    file << "Budget Utilization : "
+        << fixed
+        << setprecision(2)
+        << (result.totalCost * 100.0 / budget)
+        << "%\n";
+
+    file << "Vendors Selected : "
+        << result.selectedVendors.size()
+        << endl;
     file.close();
 
     return true;

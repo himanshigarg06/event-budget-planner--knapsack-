@@ -13,4 +13,3 @@ Welcome Gifts,6000,20
 Videography,19000,58
 Sound System,12000,39
 Games Zone,11000,37
-Chocolate Fountain,8000,30

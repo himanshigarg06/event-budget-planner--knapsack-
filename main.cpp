@@ -9,6 +9,7 @@
 #include "report.h"
 #include "session.h"
 #include "vendor_manager.h"
+#include "statistics.h"
 
 using namespace std;
 
@@ -155,12 +156,17 @@ case 7:
 }
 case 8:
 
+    displayStatistics(vendors);
+
+    break;
+case 9:
+
     cout << "\nThank you for using Event Budget Planner.\n";
 
     break;
         }
 
-    } while (choice != 8);
+    } while (choice != 9);
 
     return 0;
 }
