@@ -16,7 +16,7 @@ struct Vendor
 };
 
 // Function declarations
-void loadSampleVendors(vector<Vendor>& vendors);
+//void loadSampleVendors(vector<Vendor>& vendors);
 void displayVendors(const vector<Vendor>& vendors);
 // Loads vendors from a text file.
 bool loadVendorsFromFile(
