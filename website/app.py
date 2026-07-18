@@ -66,7 +66,7 @@ def optimize():
 
     try:
         budget = int(body["budget"])
-    except:
+    except (KeyError, ValueError):
         return jsonify({"error": "Invalid budget"}), 400
 
     try:

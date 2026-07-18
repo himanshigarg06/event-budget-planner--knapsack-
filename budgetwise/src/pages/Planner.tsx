@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { Zap, Users, MapPin, Calendar, Loader2, Sparkles, Target } from 'lucide-react'
 import type { EventConfig, EventType, OptimizationMode, Priority } from '../types'
 import { VENDOR_DATA } from '../data/vendors'
-import { optimize, formatCurrency } from '../utils/optimizer'
+import { formatCurrency } from '../utils/optimizer'
 import VendorCard from '../components/VendorCard'
 import ProgressRing from '../components/ProgressRing'
 
