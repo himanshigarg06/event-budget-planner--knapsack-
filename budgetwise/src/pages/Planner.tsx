@@ -1,11 +1,19 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
-import { Zap, Users, MapPin, Calendar, Loader2, Sparkles, Target } from 'lucide-react'
-import type { EventConfig, EventType, OptimizationMode, Priority } from '../types'
-import { VENDOR_DATA } from '../data/vendors'
-import { formatCurrency } from '../utils/optimizer'
+import { Zap, Users, MapPin, Calendar, Loader2, Sparkles, Target, Plus, RotateCcw, Search } from 'lucide-react'
+import type { EventConfig, EventType, OptimizationMode, Priority, Vendor, VendorCategory } from '../types'
+import { formatCurrency, optimize as clientOptimize } from '../utils/optimizer'
+import {
+  getStoredVendors,
+  addVendor as storeAddVendor,
+  updateVendor as storeUpdateVendor,
+  deleteVendor as storeDeleteVendor,
+  toggleVendorAvailability as storeToggleVendor,
+  resetVendorsToDefault as storeResetVendors,
+} from '../utils/vendorStore'
 import VendorCard from '../components/VendorCard'
+import VendorModal from '../components/VendorModal'
 import ProgressRing from '../components/ProgressRing'
 
 const EVENT_TYPES: EventType[] = ['Wedding', 'Corporate', 'Birthday', 'Conference', 'Festival', 'Graduation']
@@ -13,8 +21,20 @@ const eventEmoji: Record<EventType, string> = {
   Wedding: '💍', Corporate: '💼', Birthday: '🎂', Conference: '🎤', Festival: '🎉', Graduation: '🎓',
 }
 
+const CATEGORIES: (VendorCategory | 'All')[] = [
+  'All',
+  'Catering',
+  'Photography',
+  'Decoration',
+  'Entertainment',
+  'Technology',
+  'Logistics',
+  'Hospitality',
+]
+
 export default function Planner() {
   const navigate = useNavigate()
+  const [vendors, setVendors] = useState<Vendor[]>([])
   const [config, setConfig] = useState<EventConfig>({
     eventName: '',
     eventType: 'Wedding',
@@ -26,39 +46,52 @@ export default function Planner() {
     optimizationMode: 'knapsack',
   })
   const [loading, setLoading] = useState(false)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [editingVendor, setEditingVendor] = useState<Vendor | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [selectedCategory, setSelectedCategory] = useState<VendorCategory | 'All'>('All')
 
-  const totalAvailable = VENDOR_DATA.filter(v => v.available).length
+  useEffect(() => {
+    setVendors(getStoredVendors())
+  }, [])
+
+  const totalAvailable = vendors.filter(v => v.available).length
   const budgetPercent = Math.min((config.budget / 200000) * 100, 100)
 
   async function handleOptimize() {
     if (!config.eventName.trim()) return
-  
+
     setLoading(true)
-  
+
     try {
-      const response = await fetch("http://127.0.0.1:5000/api/optimize", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          budget: config.budget,
-        }),
-      })
-  
-      if (!response.ok) {
-        throw new Error("Optimization failed")
+      // Calculate locally using dynamic vendor state
+      const result = clientOptimize(vendors, config)
+
+      // Fallback/sync to Flask backend if available
+      try {
+        const response = await fetch("http://127.0.0.1:5000/api/optimize", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ budget: config.budget }),
+        })
+        if (response.ok) {
+          const apiResult = await response.json()
+          if (apiResult) {
+            // merge backend optimization metrics
+            result.executionTimeMs = apiResult.executionTimeMs || result.executionTimeMs
+          }
+        }
+      } catch (err) {
+        // use client optimization result smoothly
       }
-  
-      const result = await response.json()
-  
+
       localStorage.setItem("bw_result", JSON.stringify(result))
       localStorage.setItem("bw_config", JSON.stringify(config))
-  
+
       navigate("/results")
     } catch (err) {
       console.error(err)
-      alert("Unable to connect to BudgetWise backend.")
+      alert("Unable to process optimization.")
     } finally {
       setLoading(false)
     }
@@ -66,6 +99,47 @@ export default function Planner() {
 
   const update = (key: keyof EventConfig, val: unknown) =>
     setConfig(prev => ({ ...prev, [key]: val }))
+
+  const handleAddVendor = () => {
+    setEditingVendor(null)
+    setIsModalOpen(true)
+  }
+
+  const handleEditVendor = (vendor: Vendor) => {
+    setEditingVendor(vendor)
+    setIsModalOpen(true)
+  }
+
+  const handleSaveVendor = (vendorData: Omit<Vendor, 'id'>) => {
+    if (editingVendor) {
+      setVendors(storeUpdateVendor(vendors, editingVendor.id, vendorData))
+    } else {
+      setVendors(storeAddVendor(vendors, vendorData))
+    }
+  }
+
+  const handleDeleteVendor = (id: string) => {
+    if (confirm('Are you sure you want to delete this vendor?')) {
+      setVendors(storeDeleteVendor(vendors, id))
+    }
+  }
+
+  const handleToggleVendor = (id: string) => {
+    setVendors(storeToggleVendor(vendors, id))
+  }
+
+  const handleResetCatalog = () => {
+    if (confirm('Reset vendor catalog to original defaults?')) {
+      setVendors(storeResetVendors())
+    }
+  }
+
+  const filteredVendors = vendors.filter(v => {
+    const matchesSearch = v.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          v.category.toLowerCase().includes(searchQuery.toLowerCase())
+    const matchesCategory = selectedCategory === 'All' || v.category === selectedCategory
+    return matchesSearch && matchesCategory
+  })
 
   return (
     <div style={{ minHeight: '100vh', paddingTop: 80, position: 'relative', background: 'var(--bg-primary)' }}>
@@ -83,7 +157,7 @@ export default function Planner() {
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
               <span style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.03em' }}>
-                Event Planner
+                Event Planner & Vendor Management
               </span>
               <span className="badge badge-accent" style={{ marginLeft: 4 }}>
                 <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#6366f1', display: 'inline-block' }} />
@@ -91,7 +165,7 @@ export default function Planner() {
               </span>
             </div>
             <p style={{ fontSize: 13, color: 'var(--text-tertiary)' }}>
-              Configure your event and let the algorithm find the optimal vendor selection.
+              Configure your event, manage vendors (add, edit, select/unselect), and run optimization.
             </p>
           </div>
           <motion.button
@@ -320,34 +394,111 @@ export default function Planner() {
             </div>
           </motion.div>
 
-          {/* ── CENTER: Vendor Grid ───────────────────────────────── */}
+          {/* ── CENTER: Vendor Catalog & Management ───────────────── */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
           >
-            <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <div>
-                <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>
-                  Vendor Catalog
-                </span>
-                <span style={{ fontSize: 12, color: 'var(--text-tertiary)', marginLeft: 8 }}>
-                  {totalAvailable} available · {VENDOR_DATA.length - totalAvailable} unavailable
-                </span>
+            {/* Vendor Management Header & Toolbar */}
+            <div className="glass-panel" style={{ padding: '16px 20px', marginBottom: 16 }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginBottom: 14 }}>
+                <div>
+                  <span style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)' }}>
+                    Vendor Management Catalog
+                  </span>
+                  <span style={{ fontSize: 12, color: 'var(--text-tertiary)', marginLeft: 10 }}>
+                    {totalAvailable} selected for optimization · {vendors.length - totalAvailable} unselected
+                  </span>
+                </div>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <button
+                    onClick={handleAddVendor}
+                    className="btn-primary"
+                    style={{ padding: '8px 14px', fontSize: 12, gap: 5 }}
+                  >
+                    <Plus size={14} /> Add Vendor
+                  </button>
+                  <button
+                    onClick={handleResetCatalog}
+                    className="btn-secondary"
+                    style={{ padding: '8px 12px', fontSize: 12, gap: 5 }}
+                    title="Reset to default vendor catalog"
+                  >
+                    <RotateCcw size={13} /> Reset
+                  </button>
+                </div>
               </div>
-              <span className="badge badge-accent">All Categories</span>
+
+              {/* Filters & Search Bar */}
+              <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+                <div style={{ position: 'relative', flex: 1, minWidth: 200 }}>
+                  <Search size={14} color="var(--text-tertiary)" style={{ position: 'absolute', left: 12, top: 12 }} />
+                  <input
+                    type="text"
+                    placeholder="Search vendors..."
+                    value={searchQuery}
+                    onChange={e => setSearchQuery(e.target.value)}
+                    className="input-field"
+                    style={{ paddingLeft: 34, height: 38, fontSize: 12, width: '100%' }}
+                  />
+                </div>
+
+                <div style={{ display: 'flex', gap: 4, overflowX: 'auto', paddingBottom: 4 }}>
+                  {CATEGORIES.map(cat => (
+                    <button
+                      key={cat}
+                      onClick={() => setSelectedCategory(cat)}
+                      style={{
+                        padding: '6px 12px',
+                        borderRadius: 20,
+                        border: selectedCategory === cat ? '1px solid #6366f1' : '1px solid var(--glass-border)',
+                        background: selectedCategory === cat ? 'rgba(99,102,241,0.2)' : 'transparent',
+                        color: selectedCategory === cat ? '#a5b4fc' : 'var(--text-secondary)',
+                        fontSize: 11,
+                        fontWeight: 500,
+                        cursor: 'pointer',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {cat}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
 
+            {/* Vendor Grid */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-              {VENDOR_DATA.map((vendor, i) => (
+              {filteredVendors.map((vendor, i) => (
                 <VendorCard
                   key={vendor.id}
                   vendor={vendor}
                   index={i}
+                  onToggle={() => handleToggleVendor(vendor.id)}
+                  onEdit={() => handleEditVendor(vendor)}
+                  onDelete={() => handleDeleteVendor(vendor.id)}
                 />
               ))}
             </div>
+
+            {filteredVendors.length === 0 && (
+              <div className="glass-panel" style={{ padding: 40, textAlign: 'center', color: 'var(--text-tertiary)' }}>
+                <p>No vendors found matching "{searchQuery}".</p>
+                <button onClick={handleAddVendor} className="btn-secondary" style={{ marginTop: 10, fontSize: 12 }}>
+                  + Add New Vendor
+                </button>
+              </div>
+            )}
           </motion.div>
+
+          {/* Modal */}
+          <VendorModal
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            onSave={handleSaveVendor}
+            initialData={editingVendor}
+          />
 
           {/* ── RIGHT: Live Summary ───────────────────────────────── */}
           <motion.div
@@ -369,9 +520,9 @@ export default function Planner() {
                 sublabel="Total Budget"
               />
               <div style={{ marginTop: 20, display: 'flex', flexDirection: 'column', gap: 10 }}>
-                <BudgetRow label="Vendor Pool" value={`${totalAvailable} of ${VENDOR_DATA.length}`} />
+                <BudgetRow label="Vendor Pool" value={`${totalAvailable} of ${vendors.length}`} />
                 <BudgetRow label="Min Required" value={formatCurrency(5000)} />
-                <BudgetRow label="Max Possible" value={formatCurrency(VENDOR_DATA.reduce((s, v) => s + v.cost, 0))} />
+                <BudgetRow label="Max Possible" value={formatCurrency(vendors.reduce((s, v) => s + v.cost, 0))} />
               </div>
             </div>
 

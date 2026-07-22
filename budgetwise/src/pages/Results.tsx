@@ -13,6 +13,7 @@ import { formatCurrency, formatCurrencyFull } from '../utils/optimizer'
 import VendorCard from '../components/VendorCard'
 import ProgressRing from '../components/ProgressRing'
 import AnimatedCounter from '../components/AnimatedCounter'
+import { generatePDFReport } from '../utils/pdfGenerator'
 
 // Custom tooltip for charts
 function ChartTooltip({ active, payload, label }: any) {
@@ -119,7 +120,11 @@ export default function Results() {
                 <RefreshCw size={13} /> Re-optimize
               </button>
             </Link>
-            <button className="btn-primary" style={{ padding: '8px 18px', fontSize: 13 }}>
+            <button
+              className="btn-primary"
+              style={{ padding: '8px 18px', fontSize: 13 }}
+              onClick={() => generatePDFReport(result, config)}
+            >
               <Download size={13} /> Export Report
             </button>
           </div>

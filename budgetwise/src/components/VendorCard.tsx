@@ -2,13 +2,16 @@ import { motion } from 'framer-motion'
 import type { Vendor } from '../types'
 import { CATEGORY_COLORS } from '../data/vendors'
 import { formatCurrency } from '../utils/optimizer'
-import { MapPin, Star, Check } from 'lucide-react'
+import { MapPin, Star, Check, Edit2, Trash2, Power } from 'lucide-react'
 
 interface VendorCardProps {
   vendor: Vendor
   selected?: boolean
   rejected?: boolean
   onClick?: () => void
+  onEdit?: () => void
+  onDelete?: () => void
+  onToggle?: () => void
   compact?: boolean
   index?: number
 }
@@ -18,6 +21,9 @@ export default function VendorCard({
   selected = false,
   rejected = false,
   onClick,
+  onEdit,
+  onDelete,
+  onToggle,
   compact = false,
   index = 0,
 }: VendorCardProps) {
@@ -43,7 +49,7 @@ export default function VendorCard({
         cursor: onClick ? 'pointer' : 'default',
         position: 'relative',
         overflow: 'hidden',
-        opacity: rejected ? 0.45 : 1,
+        opacity: rejected || !vendor.available ? 0.6 : 1,
         transition: 'all var(--transition-base)',
         boxShadow: selected ? `0 0 25px ${catColor}22` : 'none',
       }}
@@ -205,20 +211,90 @@ export default function VendorCard({
             ))}
           </div>
 
-          {/* Availability */}
-          {!vendor.available && (
-            <div style={{
-              marginTop: 10,
-              paddingLeft: 8,
-              fontSize: 11,
-              color: '#f43f5e',
-              fontWeight: 500,
-            }}>
-              ⚠ Unavailable on selected date
+          {/* Availability & Actions Bar */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginTop: 16,
+            paddingTop: 12,
+            borderTop: '1px solid rgba(255,255,255,0.06)',
+            paddingLeft: 8,
+          }}>
+            {/* Toggle Availability Switch */}
+            {onToggle && (
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); onToggle(); }}
+                style={{
+                  background: vendor.available ? 'rgba(16,185,129,0.15)' : 'rgba(244,63,94,0.15)',
+                  border: vendor.available ? '1px solid rgba(16,185,129,0.3)' : '1px solid rgba(244,63,94,0.3)',
+                  color: vendor.available ? '#34d399' : '#fb7185',
+                  padding: '4px 10px',
+                  borderRadius: 20,
+                  fontSize: 11,
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 5,
+                  transition: 'all 0.2s',
+                }}
+              >
+                <Power size={11} />
+                {vendor.available ? 'Selected' : 'Unselected'}
+              </button>
+            )}
+
+            <div style={{ display: 'flex', gap: 6, marginLeft: 'auto' }}>
+              {onEdit && (
+                <button
+                  type="button"
+                  title="Edit Vendor"
+                  onClick={(e) => { e.stopPropagation(); onEdit(); }}
+                  style={{
+                    background: 'rgba(255,255,255,0.05)',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    color: 'var(--text-secondary)',
+                    padding: '6px 8px',
+                    borderRadius: 8,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    transition: 'all 0.2s',
+                  }}
+                >
+                  <Edit2 size={13} />
+                </button>
+              )}
+
+              {onDelete && (
+                <button
+                  type="button"
+                  title="Delete Vendor"
+                  onClick={(e) => { e.stopPropagation(); onDelete(); }}
+                  style={{
+                    background: 'rgba(244,63,94,0.1)',
+                    border: '1px solid rgba(244,63,94,0.2)',
+                    color: '#fb7185',
+                    padding: '6px 8px',
+                    borderRadius: 8,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    transition: 'all 0.2s',
+                  }}
+                >
+                  <Trash2 size={13} />
+                </button>
+              )}
             </div>
-          )}
+          </div>
         </>
       )}
     </motion.div>
   )
 }
+
